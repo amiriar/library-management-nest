@@ -7,6 +7,9 @@ import { User, UserDocument } from '../users/entities/user.entity';
 import { SignInDto } from './dto/SignIn.dto';
 import { RefreshTokenDto } from './dto/RefreshToken.dto';
 import { SignUpDto } from './dto/SignUp.dto';
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 
 @Injectable()
 export class AuthService {
@@ -112,7 +115,8 @@ export class AuthService {
       this.jwtService.signAsync(
         { sub: userId },
         {
-          expiresIn: '15m',
+          // expiresIn: '15m',
+          expiresIn: '5h',
           secret: process.env.JWT_ACCESS_SECRET,
         },
       ),
