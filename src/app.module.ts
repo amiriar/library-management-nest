@@ -8,9 +8,22 @@ import { UsersModule } from './module/users/users.module';
 import { BooksModule } from './module/books/books.module';
 import { AdminUsersModule } from './module/admin/admin-users/admin-users.module';
 import { AdminBooksModule } from './module/admin/admin-books/admin-books.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 
 @Module({
-  imports: [BooksModule, UsersModule, TransactionsModule, AuthModule, AdminTransactionsModule, AdminUsersModule, AdminBooksModule],
+  imports: [
+    MongooseModule.forRoot(process.env.MONGO_CONNECTION_STRING),
+    BooksModule,
+    UsersModule,
+    TransactionsModule,
+    AuthModule,
+    AdminTransactionsModule,
+    AdminUsersModule,
+    AdminBooksModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
