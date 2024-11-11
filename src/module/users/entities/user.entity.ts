@@ -16,6 +16,9 @@ export class User {
 
     @Prop()
     refreshToken?: string;
+    
+    @Prop({ type: Number, default: 0 })
+    balance: number;
 
     @Prop({ enum: ['USER', 'AUTHOR', 'ADMIN'], default: 'USER' })
     role: string;

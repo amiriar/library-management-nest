@@ -18,8 +18,17 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
 
     try {
-      const cookies = cookie.parse(request.headers.cookie || '');
-      const token = cookies['accessToken'];
+      // Check for Bearer token in Authorization header
+      const authHeader = request.headers.authorization;
+      let token: string;
+
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      } else {
+        // Fallback to cookie if no Bearer token
+        const cookies = cookie.parse(request.headers.cookie || '');
+        token = cookies['accessToken'];
+      }
 
       if (!token) {
         throw new UnauthorizedException(
@@ -27,9 +36,12 @@ export class AuthGuard implements CanActivate {
         );
       }
 
+      token = token?.startsWith('Bearer ') ? token.substring(7) : token;
+
       const decodedToken = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET_KEY,
       });
+
       request.user = decodedToken;
 
       return true;

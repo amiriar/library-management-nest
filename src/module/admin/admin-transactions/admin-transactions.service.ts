@@ -1,26 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateAdminTransactionDto } from './dto/create-admin-transaction.dto';
 import { UpdateAdminTransactionDto } from './dto/update-admin-transaction.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Transaction, TransactionDocument } from 'src/module/transactions/entities/transaction.entity';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AdminTransactionsService {
-  create(createAdminTransactionDto: CreateAdminTransactionDto) {
-    return 'This action adds a new adminTransaction';
+  constructor(
+    @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>
+  ) {}
+  
+  async findAll(): Promise<Transaction[]> {
+    try {
+      return await this.transactionModel.find().exec();
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching transactions');
+    }
   }
 
-  findAll() {
-    return `This action returns all adminTransactions`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} adminTransaction`;
-  }
-
-  update(id: number, updateAdminTransactionDto: UpdateAdminTransactionDto) {
-    return `This action updates a #${id} adminTransaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} adminTransaction`;
+  async remove(id: string): Promise<Transaction> {
+    try {
+      const deletedTransaction = await this.transactionModel
+        .findByIdAndDelete(id)
+        .exec();
+      if (!deletedTransaction) {
+        throw new NotFoundException(`Transaction with ID ${id} not found`);
+      }
+      return deletedTransaction;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Error deleting transaction');
+    }
   }
 }

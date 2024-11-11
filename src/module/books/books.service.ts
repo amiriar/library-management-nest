@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateBookDto } from '../admin/admin-books/dto/create-book.dto';
+import { UpdateBookDto } from '../admin/admin-books/dto/update-book.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Book, BookDocument } from './entities/book.entity';
 
 @Injectable()
 export class BooksService {
-  create(createBookDto: CreateBookDto) {
-    return 'This action adds a new book';
+  constructor(@InjectModel(Book.name) private bookModel: Model<BookDocument>) {}
+
+  async findAll(): Promise<Book[]> {
+    try {
+      return await this.bookModel.find().exec();
+    } catch (error) {
+      throw new Error(`Failed to find books: ${error.message}`);
+    }
   }
 
-  findAll() {
-    return `This action returns all books`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} book`;
-  }
-
-  update(id: number, updateBookDto: UpdateBookDto) {
-    return `This action updates a #${id} book`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} book`;
+  async findOne(id: string): Promise<Book> {
+    try {
+      const book = await this.bookModel.findById(id).exec();
+      if (!book) {
+        throw new NotFoundException(`Book with ID "${id}" not found`);
+      }
+      return book;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(`Failed to find book: ${error.message}`);
+    }
   }
 }

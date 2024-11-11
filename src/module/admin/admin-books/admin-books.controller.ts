@@ -1,34 +1,41 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { AdminBooksService } from './admin-books.service';
-import { CreateAdminBookDto } from './dto/create-admin-book.dto';
-import { UpdateAdminBookDto } from './dto/update-admin-book.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
+import { AuthGuard } from 'src/common/guard/AuthGuard.guard';
+import { RolesGuard } from 'src/common/guard/roles.guard';
 
 @Controller('admin-books')
+@UseGuards(AuthGuard, RolesGuard)
+@Roles('ADMIN')
 export class AdminBooksController {
   constructor(private readonly adminBooksService: AdminBooksService) {}
 
   @Post()
-  create(@Body() createAdminBookDto: CreateAdminBookDto) {
-    return this.adminBooksService.create(createAdminBookDto);
+  create(@Body() createBookDto: CreateBookDto) {
+    const jalaliDate = new Date().toLocaleDateString('fa-IR');
+    return this.adminBooksService.create({
+      ...createBookDto,
+      date: jalaliDate,
+    });
   }
-
-  @Get()
-  findAll() {
-    return this.adminBooksService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminBooksService.findOne(+id);
-  }
-
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminBookDto: UpdateAdminBookDto) {
-    return this.adminBooksService.update(+id, updateAdminBookDto);
+  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
+    return this.adminBooksService.update(id, updateBookDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.adminBooksService.remove(+id);
+    return this.adminBooksService.remove(id);
   }
 }

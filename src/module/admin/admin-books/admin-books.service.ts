@@ -1,26 +1,52 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAdminBookDto } from './dto/create-admin-book.dto';
-import { UpdateAdminBookDto } from './dto/update-admin-book.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateBookDto } from './dto/create-book.dto';
+import { Book, BookDocument } from 'src/module/books/entities/book.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { UpdateBookDto } from './dto/update-book.dto';
 
 @Injectable()
 export class AdminBooksService {
-  create(createAdminBookDto: CreateAdminBookDto) {
-    return 'This action adds a new adminBook';
+  constructor(@InjectModel(Book.name) private bookModel: Model<BookDocument>) {}
+
+  async create(createBookDto: CreateBookDto): Promise<Book> {
+    try {
+      const createdBook = new this.bookModel(createBookDto);
+      return await createdBook.save();
+    } catch (error) {
+      throw new Error(`Failed to create book: ${error.message}`);
+    }
   }
 
-  findAll() {
-    return `This action returns all adminBooks`;
+  async update(id: string, updateBookDto: UpdateBookDto): Promise<Book> {
+    try {
+      const updatedBook = await this.bookModel
+        .findByIdAndUpdate(id, updateBookDto, { new: true })
+        .exec();
+      if (!updatedBook) {
+        throw new NotFoundException(`Book with ID "${id}" not found`);
+      }
+      return updatedBook;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(`Failed to update book: ${error.message}`);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} adminBook`;
-  }
-
-  update(id: number, updateAdminBookDto: UpdateAdminBookDto) {
-    return `This action updates a #${id} adminBook`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} adminBook`;
+  async remove(id: string): Promise<Book> {
+    try {
+      const deletedBook = await this.bookModel.findByIdAndDelete(id).exec();
+      if (!deletedBook) {
+        throw new NotFoundException(`Book with ID "${id}" not found`);
+      }
+      return deletedBook;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(`Failed to delete book: ${error.message}`);
+    }
   }
 }
