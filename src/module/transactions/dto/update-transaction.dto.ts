@@ -1,4 +1,13 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateTransactionDto } from './create-transaction.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsEnum, IsMongoId } from 'class-validator';
 
-export class UpdateTransactionDto extends PartialType(CreateTransactionDto) {}
+export class UpdateTransactionDto {
+  @ApiProperty({
+    description: 'The status of the transaction',
+    enum: ['pending', 'completed', 'cancelled'],
+    example: 'pending',
+  })
+  @IsNotEmpty()
+  @IsEnum(['pending', 'completed', 'cancelled'])
+  status: string;
+}

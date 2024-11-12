@@ -14,9 +14,9 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { AuthGuard } from 'src/common/guard/AuthGuard.guard';
 import { RolesGuard } from 'src/common/guard/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
 import { Request } from 'express';
-
+import { UserDocument } from '../users/entities/user.entity';
+  
 @Controller('transactions')
 @UseGuards(AuthGuard, RolesGuard)
 export class TransactionsController {
@@ -24,7 +24,9 @@ export class TransactionsController {
 
   @Post()
   create(@Body() createTransactionDto: CreateTransactionDto, @Req() req: Request) {
-    const user = req.user
+    const user = req.user as UserDocument;
+    createTransactionDto.user = user._id;
+    createTransactionDto.date = new Date().toLocaleDateString('fa-IR');
     return this.transactionsService.create(createTransactionDto);
   }
 

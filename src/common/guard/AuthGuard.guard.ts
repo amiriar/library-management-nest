@@ -42,6 +42,10 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET_KEY,
       });
 
+      
+      decodedToken._id = decodedToken.sub
+      delete decodedToken.sub
+
       request.user = decodedToken;
 
       return true;

@@ -16,6 +16,9 @@ export class Transaction {
   @Prop({ required: false })
   amount: number;
 
+  @Prop({ enum: ['pending', 'completed', 'cancelled'] })
+  status: string;
+
   @Prop()
   date: string;
 }

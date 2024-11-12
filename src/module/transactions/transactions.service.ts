@@ -16,6 +16,8 @@ export class TransactionsService {
       const createdTransaction = new this.transactionModel(createTransactionDto);
       return await createdTransaction.save();
     } catch (error) {
+      console.log(error);
+      
       throw new InternalServerErrorException('Error creating transaction');
     }
   }
