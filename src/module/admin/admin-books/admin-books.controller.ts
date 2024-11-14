@@ -17,11 +17,11 @@ import { RolesGuard } from 'src/common/guard/roles.guard';
 
 @Controller('admin-books')
 @UseGuards(AuthGuard, RolesGuard)
-@Roles('ADMIN')
 export class AdminBooksController {
   constructor(private readonly adminBooksService: AdminBooksService) {}
 
   @Post()
+  @Roles('ADMIN')
   create(@Body() createBookDto: CreateBookDto) {
     const jalaliDate = new Date().toLocaleDateString('fa-IR');
     return this.adminBooksService.create({
@@ -30,11 +30,13 @@ export class AdminBooksController {
     });
   }
   @Patch(':id')
+  @Roles('ADMIN')
   update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
     return this.adminBooksService.update(id, updateBookDto);
   }
 
   @Delete(':id')
+  @Roles('ADMIN')
   remove(@Param('id') id: string) {
     return this.adminBooksService.remove(id);
   }

@@ -9,9 +9,9 @@ import { Book, BookDocument } from './entities/book.entity';
 export class BooksService {
   constructor(@InjectModel(Book.name) private bookModel: Model<BookDocument>) {}
 
-  async findAll(): Promise<Book[]> {
+  async findAll(page: number, limit: number): Promise<Book[]> {
     try {
-      return await this.bookModel.find().exec();
+      return await this.bookModel.find().skip(page * limit).limit(limit).exec();
     } catch (error) {
       throw new Error(`Failed to find books: ${error.message}`);
     }

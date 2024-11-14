@@ -3,18 +3,20 @@ import {
   Get,
   Param,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
-import { AuthGuard } from 'src/common/guard/AuthGuard.guard';
-import { RolesGuard } from 'src/common/guard/roles.guard';
+import { ApiQuery } from '@nestjs/swagger';
 
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
   @Get()
-  findAll() {
-    return this.booksService.findAll();
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Limit per page' })
+  findAll(@Query('page') page: number, @Query('limit') limit: number) {
+    return this.booksService.findAll(page, limit);
   }
 
   @Get(':id')

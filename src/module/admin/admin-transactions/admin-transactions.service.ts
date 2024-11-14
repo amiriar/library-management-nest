@@ -11,9 +11,9 @@ export class AdminTransactionsService {
     @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>
   ) {}
   
-  async findAll(): Promise<Transaction[]> {
+  async findAll(page: number, limit: number): Promise<Transaction[]> {
     try {
-      return await this.transactionModel.find().exec();
+      return await this.transactionModel.find().skip(page * limit).limit(limit).exec();
     } catch (error) {
       throw new InternalServerErrorException('Error fetching transactions');
     }

@@ -1,26 +1,33 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAdminUserDto } from './dto/create-admin-user.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User } from 'src/module/users/entities/user.entity';
 import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AdminUsersService {
-  create(createAdminUserDto: CreateAdminUserDto) {
-    return 'This action adds a new adminUser';
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+
+  async findAll(page: number, limit: number): Promise<{ users: User[], total: number }> {
+    const users = await this.userModel.find().skip(page * limit).limit(limit).exec();
+    const total = await this.userModel.countDocuments();
+    return { users, total };
   }
 
-  findAll() {
-    return `This action returns all adminUsers`;
+  async findOne(id: string): Promise<User> {
+    return this.userModel.findById(id).exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} adminUser`;
+  async update(
+    id: string,
+    updateAdminUserDto: UpdateAdminUserDto,
+  ): Promise<User> {
+    return this.userModel
+      .findByIdAndUpdate(id, updateAdminUserDto, { new: true })
+      .exec();
   }
 
-  update(id: number, updateAdminUserDto: UpdateAdminUserDto) {
-    return `This action updates a #${id} adminUser`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} adminUser`;
+  async remove(id: string): Promise<User> {
+    return this.userModel.findOneAndDelete({ _id: id }).exec();
   }
 }
