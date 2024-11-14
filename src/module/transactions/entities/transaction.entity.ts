@@ -10,10 +10,7 @@ export class Transaction {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
   user: User;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Book', required: true })
-  book: Book;
-
-  @Prop({ required: false })
+  @Prop({ required: true })
   amount: number;
 
   @Prop({ enum: ['pending', 'completed', 'cancelled'] })

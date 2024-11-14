@@ -20,14 +20,6 @@ export class CreateTransactionDto {
   amount: number;
 
   @ApiProperty({
-    description: 'The book of the transaction',
-    example: '672add26b85d6be186dc7f40',
-  })
-  @IsNotEmpty()
-  @IsString()
-  book: Types.ObjectId;
-
-  @ApiProperty({
     description: 'The status of the transaction',
     enum: ['pending', 'completed', 'cancelled'],
     example: 'pending',

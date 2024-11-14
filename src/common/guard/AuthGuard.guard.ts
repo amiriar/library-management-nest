@@ -46,7 +46,7 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET_KEY,
       });
 
-      const user = await this.userService.findOne(decodedToken._id);
+      const user = await this.userService.findOne(decodedToken.sub);
       request.user = user;
       // request.user = decodedToken;
 
